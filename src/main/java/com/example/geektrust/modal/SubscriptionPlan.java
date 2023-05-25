@@ -1,11 +1,6 @@
 package com.example.geektrust.modal;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import static com.example.geektrust.constants.Commands.DATE_FORMATTER;
-
-public abstract class SubscriptionPlan {
+public class SubscriptionPlan {
     private String planName;
     private int durationMonths;
     private int cost;
@@ -28,17 +23,7 @@ public abstract class SubscriptionPlan {
         return cost;
     }
 
-    public abstract String getCategory();
-
-    public String calculateRenewalDate(LocalDate startDate, int durationMonths) {
-        LocalDate localDate = startDate.plusMonths(durationMonths);
-        localDate = localDate.minusDays(10);
-        String renewableDate = localDate.format(DateTimeFormatter.ofPattern(DATE_FORMATTER.getValue()));
-        return renewableDate;
-    }
-
-
     public boolean hasPlanName(String planName) {
-        return getPlanName().equals(planName);
+        return this.planName.equals(planName);
     }
 }

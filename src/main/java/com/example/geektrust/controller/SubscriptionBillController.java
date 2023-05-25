@@ -1,40 +1,35 @@
 package com.example.geektrust.controller;
 
-import com.example.geektrust.error.ErrorTracker;
+
+import com.example.geektrust.error.ExceptionHandler;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 
 import static com.example.geektrust.constants.Commands.*;
 import static com.example.geektrust.constants.Status.NO_ERROR;
 
 public class SubscriptionBillController {
 
-
     private SubscriptionsTopUpsController subscriptionsTopUpsController;
-    private ErrorTracker errorTracker;
+    private ExceptionHandler exceptionHandler;
 
-
-    public SubscriptionBillController() {
-        this.errorTracker = errorTracker.getInstance();
-        this.subscriptionsTopUpsController = new SubscriptionsTopUpsController(errorTracker);
+    public SubscriptionBillController(SubscriptionsTopUpsController subscriptionsTopUpsController, ExceptionHandler exceptionHandler) {
+        this.subscriptionsTopUpsController = subscriptionsTopUpsController;
+        this.exceptionHandler = exceptionHandler;
 
     }
-
-
-
     public void processCommand(String[] tokens) {
         if (tokens[0].equals(START_SUBSCRIPTION.getValue())) {
             try {
-                LocalDate startDate = LocalDate.parse(tokens[1], DateTimeFormatter.ofPattern(DATE_FORMATTER.getValue()));
-                errorTracker.setStartDate(startDate);
-                errorTracker.setError(NO_ERROR.getValue());
 
+                LocalDate startDate = LocalDate.parse(tokens[1], DateTimeFormatter.ofPattern(DATE_FORMATTER.getValue()));
+                exceptionHandler.setStartDate(startDate);
+                exceptionHandler.setError(NO_ERROR.getValue());
             } catch (DateTimeParseException e) {
-                errorTracker.setError(INVALID_DATE.getValue());
                 System.out.println(INVALID_DATE.getValue());
+                exceptionHandler.setError(String.valueOf(INVALID_DATE.getValue()));
             }
         } else if (tokens[0].equals(ADD_SUBSCRIPTION.getValue())) {
             subscriptionsTopUpsController.addSubscription(tokens[1], tokens[2]);
@@ -49,8 +44,8 @@ public class SubscriptionBillController {
 
 
     public void printBill () {
-        if (errorTracker.isInvalidDate()) {
-            errorTracker.handleInValidDateErrorBySubscriptionBill();
+        if (exceptionHandler.isInvalidDate()) {
+            exceptionHandler.handleInValidDateErrorBySubscriptionBill();
         } else {
             subscriptionsTopUpsController.printBill();
         }

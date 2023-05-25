@@ -1,16 +1,10 @@
 package com.example.geektrust.modal;
 
-import com.example.geektrust.repository.TopUpRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class TopUp {
-
-
     private TopUpPlan topUpPlan;
     private int devices;
 
+    private int billAmount;
 
     public TopUp(TopUpPlan topUpPlan, int devices) {
         this.topUpPlan = topUpPlan;
@@ -23,6 +17,16 @@ public class TopUp {
 
     public int getDevices() {
         return devices;
+    }
+
+
+    public int getBillAmount() {
+        return billAmount;
+    }
+
+
+    public void UpdateBillAmount(TopUpPlan topUpPlan) {
+        billAmount+=topUpPlan.getAmount()*devices;
     }
 
 }

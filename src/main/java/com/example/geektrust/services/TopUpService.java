@@ -1,50 +1,45 @@
 package com.example.geektrust.services;
 
-import com.example.geektrust.error.ErrorTracker;
-import com.example.geektrust.error.ErrorHandler;
+import com.example.geektrust.error.ExceptionHandler;
+import com.example.geektrust.repository.interfaces.TopUpPlanInterface;
 import com.example.geektrust.modal.TopUp;
 import com.example.geektrust.modal.TopUpPlan;
-import com.example.geektrust.repository.TopUpPlanRepository;
-import com.example.geektrust.repository.TopUpRepository;
-import com.example.geektrust.repository.implementations.TopUpPlanRepositoryImpl;
-import com.example.geektrust.repository.implementations.TopUpRepositoryImpl;
+import com.example.geektrust.repository.interfaces.TopUpInterface;
 
 import java.util.List;
 
-public class TopUpService extends ErrorHandler {
+public class TopUpService {
 
-    private TopUpRepository topUpRepository;
-    private TopUpPlanRepository topUpPlanRepository;
+    private TopUpPlanInterface topUpPlanInterface;
+    private TopUpInterface topUpInterface;
+    private ExceptionHandler exceptionHandler;
 
-    private ErrorHandler errorHandler;
-
-    public TopUpService() {
-        this.topUpRepository = new TopUpRepositoryImpl();
-        this.topUpPlanRepository = new TopUpPlanRepositoryImpl();
-        this.errorHandler = ErrorTracker.getInstance();
+    public TopUpService(TopUpInterface topUpInterface, TopUpPlanInterface topUpPlanInterface, ExceptionHandler exceptionHandler) {
+        this.topUpInterface = topUpInterface;
+        this.topUpPlanInterface = topUpPlanInterface;
+        this.exceptionHandler = exceptionHandler ;
     }
 
     public void addTopUp(String maxDevices, int months) {
-        if (!topUpRepository.getAllTopUps().isEmpty()) {
-            errorHandler.handleDuplicateTopUpError();
+        if (!topUpInterface.getAllTopUps().isEmpty()) {
+            exceptionHandler.handleDuplicateTopUpError();
         } else {
-            TopUpPlan topUpPlan = topUpPlanRepository.getTopUpPlanByMaxDevice(maxDevices);
-            topUpRepository.addTopUp(new TopUp(topUpPlan, months));
+            TopUpPlan topUpPlan = topUpPlanInterface.getTopUpPlanByMaxDevice(maxDevices);
+            TopUp topUp = new TopUp(topUpPlan, months);
+            topUpInterface.addTopUp(topUp);
+            topUpInterface.updateBillAmount(topUp);
         }
     }
 
-
-
     public List<TopUp> getTopUps() {
-        return topUpRepository.getAllTopUps();
+        return topUpInterface.getAllTopUps();
     }
 
-    public int calculateTopUpRenewalAmount(List<TopUp> topUps, int totalBillAmount) {
+    public int calculateTopUpRenewalAmount(List<TopUp> topUps) {
+        int totalBillAmount = 0;
         for (TopUp topUp : topUps) {
-            TopUpPlan topUpPlan = topUp.getTopUpPlan();
-            totalBillAmount = topUpRepository.calculateBillAmount(topUpPlan, topUp.getDevices(), totalBillAmount);
+            totalBillAmount = topUpInterface.calculateBillAmount(topUp, totalBillAmount);
         }
         return totalBillAmount;
     }
-
 }

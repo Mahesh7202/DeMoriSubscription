@@ -11,9 +11,19 @@ public class TopUpPlan {
         this.amount = amount;
     }
 
+    public String getTopUpName() {
+        return topUpName;
+    }
+
+    public int getMaxDevices() {
+        return maxDevices;
+    }
+
     public int getAmount() {
         return amount;
     }
 
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
 }
-
